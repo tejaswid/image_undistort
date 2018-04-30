@@ -1,0 +1,25 @@
+<launch>
+  <!-- Play data from bag [set this to true] -->
+  <arg name="play_bag" default="true" />
+
+<arg name="input_camera_name" default="camera/fisheye" />
+<arg name="scale" default="1.0" />
+
+<!-- Camera calibration file -->
+  <arg name="calib_path" default="/media/drzadmin/DATA/Projects/Tree_Scanning/drz_rig_tejaswi/calib/zr300_fisheye/camchain-zr300_fisheye.yaml" />
+<!-- Bag file to load -->
+  <arg name="bag_file" default="/media/drzadmin/DATA/Projects/Tree_Scanning/drz_rig_tejaswi/apriltag_test/apriltag_test_1.bag"/>
+
+<!-- Rosbag Player-->
+  <node name="player" pkg="rosbag" type="play" output="screen" args=" -r 1.0 --clock $(arg bag_file)" if="$(arg play_bag)"/>
+
+<!-- Image Undistortion -->
+  <node name="image_undistort_node" pkg="image_undistort" type="image_undistort_node">
+    <param name="input_camera_namespace" value="cam0"/>      
+    <param name="input_camera_info_from_ros_params" value = "true"/>    
+    <param name="scale" value="$(arg scale)"/>
+    <rosparam file="$(arg calib_path)"/>
+    <remap from="input/image" to="$(arg input_camera_name)/image_raw"/>
+  </node>
+
+</launch>
